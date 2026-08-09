@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQ PDF Solutions - Free Online PDF Compressor & Page Extractor</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="AQ PDF Solutions is a fast, secure, and free online PDF utility. Compress PDF file size to 1MB, extract pages into single PDFs, and manage documents seamlessly without losing quality.">
+    <meta name="keywords" content="Compress PDF, Reduce PDF Size, PDF Extractor, Split PDF online, Free PDF Tools, AQ PDF Solutions, Compress PDF to 1MB, PDF size reducer free, Extract pages from PDF, Split PDF pages free">
+    <meta name="author" content="AQ PDF Solutions">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Social Media Meta -->
+    <meta property="og:title" content="AQ PDF Solutions - Free Online PDF Compressor & Page Extractor">
+    <meta property="og:description" content="Fast, secure, and browser-based PDF utilities. Compress PDF sizes and extract pages into single PDFs easily.">
+    <meta property="og:type" content="website">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- pdf-lib CDN for Lossless Extraction -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- JSZip CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #d946ef 100%);
+        }
+        .active-tab {
+            border-bottom: 3px solid #f59e0b;
+            color: #f59e0b;
+        }
+        .ads-box {
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 2px dashed #475569;
+            color: #94a3b8;
+            text-align: center;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <!-- Header Section -->
+    <header class="gradient-bg text-white py-8 shadow-xl">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-2">
+                <i class="fa-solid fa-file-pdf text-amber-400 mr-3"></i>AQ PDF Solutions
+            </h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">
+                All-in-One Fast, Secure, & Free Online PDF Compressor & Page Extractor.
+            </p>
+
+            <!-- Navigation Tabs -->
+            <div class="flex justify-center gap-6 mt-6 text-lg font-bold border-b border-white/20 pb-2">
+                <button id="tabCompressorBtn" onclick="switchTab('compressor')" class="active-tab pb-2 px-4 flex items-center gap-2 hover:text-amber-300 transition">
+                    <i class="fa-solid fa-compress"></i> PDF Compressor
+                </button>
+                <button id="tabExtractorBtn" onclick="switchTab('extractor')" class="pb-2 px-4 flex items-center gap-2 text-slate-200 hover:text-amber-300 transition">
+                    <i class="fa-solid fa-file-export"></i> PDF Page Extractor
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Ad Banner Placeholder -->
+    <div class="container mx-auto px-4 mt-6 max-w-5xl">
+        <div class="ads-box h-24 w-full my-2">
+            <!-- GOOGLE ADSENSE CODE GOES HERE (Leaderboard Banner 728x90) -->
+            <span><i class="fa-solid fa-rectangle-ad mr-2"></i> Ad Space (Top Header Banner)</span>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6 max-w-5xl">
+
+        <!-- ================= TAB 1: COMPRESSOR ================= -->
+        <div id="compressorTab" class="block">
+            <!-- Controls & Upload Area -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 mb-8 shadow-2xl">
+                
+                <!-- Quality & Target Settings -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
+                        <label class="block font-semibold mb-2 text-indigo-300">
+                            <i class="fa-solid fa-sliders mr-2"></i>Compression Quality: <span id="qualityVal" class="text-white font-bold">60%</span>
+                        </label>
+                        <input type="range" id="qualitySlider" min="10" max="90" value="60" class="w-full accent-indigo-500 cursor-pointer">
+                        <p class="text-xs text-slate-400 mt-1">Lower quality = Smaller file size (Ideal for target &lt; 1 MB)</p>
+                    </div>
+                    <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
+                        <label class="block font-semibold mb-2 text-pink-300">
+                            <i class="fa-solid fa-expand mr-2"></i>Resolution Scale: <span id="scaleVal" class="text-white font-bold">1.2x</span>
+                        </label>
+                        <input type="range" id="scaleSlider" min="0.5" max="2" step="0.1" value="1.2" class="w-full accent-pink-500 cursor-pointer">
+                        <p class="text-xs text-slate-400 mt-1">Adjust page clarity vs file size ratio</p>
+                    </div>
+                </div>
+
+                <!-- Drag and Drop Box -->
+                <div id="dropZone" class="border-3 border-dashed border-indigo-500 hover:border-pink-500 bg-slate-800/80 hover:bg-slate-700/50 rounded-2xl p-10 text-center cursor-pointer transition-all duration-300">
+                    <i class="fa-solid fa-cloud-arrow-up text-6xl text-indigo-400 mb-4 animate-bounce"></i>
+                    <h3 class="text-2xl font-bold mb-2">Drag & Drop PDFs Here</h3>
+                    <p class="text-slate-400 mb-4">or click to browse multiple files from your device</p>
+                    <input type="file" id="fileInput" multiple accept="application/pdf" class="hidden">
+                    <button onclick="document.getElementById('fileInput').click()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:-translate-y-0.5">
+                        Select Bulk PDF Files
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress & Actions Bar -->
+            <div id="actionHeader" class="hidden flex flex-wrap justify-between items-center gap-4 mb-4">
+                <h2 class="text-2xl font-bold text-slate-200">Processing Queue (<span id="fileCount">0</span>)</h2>
+                <div class="flex flex-wrap gap-3">
+                    <button id="compressAllBtn" onclick="processAllFiles()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Compress All Files
+                    </button>
+                    <button id="downloadZipBtn" onclick="downloadAllZip()" class="hidden bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-file-zipper"></i> Download All (ZIP)
+                    </button>
+                    <button id="clearAllBtn" onclick="clearAllFiles()" class="bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-trash-arrow-up"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- File List Dashboard -->
+            <div id="fileList" class="space-y-4"></div>
+        </div>
+
+
+        <!-- ================= TAB 2: EXTRACTOR ================= -->
+        <div id="extractorTab" class="hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 mb-8 shadow-2xl">
+                <!-- Extractor Upload Zone -->
+                <div id="extractDropZone" class="border-3 border-dashed border-purple-500 hover:border-amber-400 bg-slate-800/80 hover:bg-slate-700/50 rounded-2xl p-10 text-center cursor-pointer transition-all duration-300">
+                    <i class="fa-solid fa-file-circle-plus text-6xl text-purple-400 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Upload Multi-Page PDF</h3>
+                    <p class="text-slate-400 mb-4">Select a multi-page PDF file to split into individual single-page PDFs</p>
+                    <input type="file" id="extractFileInput" accept="application/pdf" class="hidden">
+                    <button onclick="document.getElementById('extractFileInput').click()" class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:-translate-y-0.5">
+                        Select PDF File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Extractor Action Header -->
+            <div id="extractActionHeader" class="hidden flex flex-wrap justify-between items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-200" id="extractFileName">File Loaded</h2>
+                    <p class="text-sm text-slate-400" id="extractFileMeta"></p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button id="extractAllBtn" onclick="extractPages()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-scissors"></i> Extract All Pages
+                    </button>
+                    <button id="downloadExtractZipBtn" onclick="downloadExtractedZip()" class="hidden bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-file-zipper"></i> Download Extracted Pages (ZIP)
+                    </button>
+                    <button onclick="clearExtractor()" class="bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-trash-arrow-up"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Extracted Pages Grid -->
+            <div id="extractedPagesList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- In-Content Ad Placeholder for AdSense -->
+        <div class="ads-box h-28 w-full my-8">
+            <!-- GOOGLE ADSENSE CODE GOES HERE (In-Article Banner) -->
+            <span><i class="fa-solid fa-rectangle-ad mr-2"></i> Ad Space (In-Middle Content Banner)</span>
+        </div>
+
+        <!-- SEO Content Section for Google Ranking & AdSense Approval -->
+        <section class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 mt-8">
+            <h2 class="text-2xl font-bold text-amber-400 mb-4">Free Online PDF Utilities - AQ PDF Solutions</h2>
+            <p class="text-slate-300 mb-4 leading-relaxed">
+                Welcome to <strong>AQ PDF Solutions</strong>, your trusted web utility to compress PDF files and extract individual pages online for free. Whether you need to reduce PDF size below 1MB for email attachments, job applications, or official forms, our advanced PDF Compressor tool delivers quick results without sacrificing document clarity.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <h3 class="text-xl font-semibold text-indigo-300 mb-2"><i class="fa-solid fa-compress mr-2"></i>Fast PDF Compressor</h3>
+                    <p class="text-sm text-slate-400">
+                        Easily compress bulk PDF files directly inside your web browser. Customize compression ratio and resolution to meet strict upload limits.
+                    </p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <h3 class="text-xl font-semibold text-purple-300 mb-2"><i class="fa-solid fa-scissors mr-2"></i>PDF Page Extractor & Splitter</h3>
+                    <p class="text-sm text-slate-400">
+                        Split multi-page PDF documents into single-page PDFs instantly with lossless quality. Download separate pages individually or bundled in a ZIP archive.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Footer Ad Banner Placeholder -->
+    <div class="container mx-auto px-4 max-w-5xl">
+        <div class="ads-box h-24 w-full my-4">
+            <!-- GOOGLE ADSENSE CODE GOES HERE (Footer Banner 728x90) -->
+            <span><i class="fa-solid fa-rectangle-ad mr-2"></i> Ad Space (Bottom Footer Banner)</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 text-slate-400 py-6 text-center border-t border-slate-800 text-sm">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2026 <strong>AQ PDF Solutions</strong>. All Rights Reserved. Fast, Secure & Client-Side PDF Utilities.</p>
+        </div>
+    </footer>
+<!-- Custom Tools & Contact Section -->
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center; font-family: sans-serif;">
+  <h3 style="color: #1e293b; margin-bottom: 10px; font-size: 20px;">Need Custom Web Tools or Dashboards?</h3>
+  <p style="color: #64748b; margin-bottom: 15px; font-size: 14px; max-width: 600px; margin-left: auto; margin-right: auto;">
+    We build light-weight, single-file, browser-based customized tools & management systems according to your business needs:
+  </p>
+  
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px;">
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">School Management Systems</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Accounting & Invoicing Tools</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Hotel & Daily Booking Dashboards</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Employee & HR Databases</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inventory & Stock Management</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Camp & Manpower Tracking</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">POS / Retail Billing Systems</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Document Organizers</span>
+    <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">PDF & Utility Web Apps</span>
+  </div>
+
+  <div style="font-size: 15px; color: #334155;">
+    <strong>For Custom Development & Orders, Contact Us:</strong><br>
+    <a href="mailto:amal.tech56@gmail.com" style="color: #2563eb; font-weight: bold; text-decoration: none; font-size: 16px; display: inline-block; margin-top: 5px;">
+      ✉️ amal.tech56@gmail.com
+    </a>
+  </div>
+</div>
+
+    <script>
+        // PDF.js worker setup
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Tab Switching
+        function switchTab(tab) {
+            const compTab = document.getElementById('compressorTab');
+            const extTab = document.getElementById('extractorTab');
+            const compBtn = document.getElementById('tabCompressorBtn');
+            const extBtn = document.getElementById('tabExtractorBtn');
+
+            if (tab === 'compressor') {
+                compTab.classList.remove('hidden');
+                extTab.classList.add('hidden');
+                compBtn.classList.add('active-tab');
+                compBtn.classList.remove('text-slate-200');
+                extBtn.classList.remove('active-tab');
+                extBtn.classList.add('text-slate-200');
+            } else {
+                compTab.classList.add('hidden');
+                extTab.classList.remove('hidden');
+                extBtn.classList.add('active-tab');
+                extBtn.classList.remove('text-slate-200');
+                compBtn.classList.remove('active-tab');
+                compBtn.classList.add('text-slate-200');
+            }
+        }
+
+        // ================= COMPRESSOR LOGIC =================
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const fileList = document.getElementById('fileList');
+        const actionHeader = document.getElementById('actionHeader');
+        const fileCountSpan = document.getElementById('fileCount');
+
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityVal = document.getElementById('qualityVal');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const scaleVal = document.getElementById('scaleVal');
+        const downloadZipBtn = document.getElementById('downloadZipBtn');
+
+        let loadedFiles = [];
+
+        qualitySlider.addEventListener('input', (e) => qualityVal.innerText = `${e.target.value}%`);
+        scaleSlider.addEventListener('input', (e) => scaleVal.innerText = `${e.target.value}x`);
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-pink-500'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-pink-500'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-pink-500');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            for (let file of files) {
+                if (file.type === "application/pdf") {
+                    const id = 'file-' + Math.random().toString(36).substr(2, 9);
+                    loadedFiles.push({ id, file, compressedBlob: null });
+                }
+            }
+            renderFileList();
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function renderFileList() {
+            if (loadedFiles.length > 0) {
+                actionHeader.classList.remove('hidden');
+            } else {
+                actionHeader.classList.add('hidden');
+            }
+            fileCountSpan.innerText = loadedFiles.length;
+            fileList.innerHTML = '';
+
+            checkCompressedStatus();
+
+            loadedFiles.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all";
+                div.id = item.id;
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-4 w-full md:w-auto">
+                        <div class="p-3 bg-red-500/10 text-red-400 rounded-xl">
+                            <i class="fa-solid fa-file-pdf text-3xl"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-semibold text-slate-100 truncate max-w-xs md:max-w-md">${item.file.name}</h4>
+                            <div class="flex gap-3 text-xs text-slate-400 mt-1">
+                                <span>Original: <b class="text-slate-200">${formatBytes(item.file.size)}</b></span>
+                                <span id="compSize-${item.id}" class="text-emerald-400 font-bold ${item.compressedBlob ? '' : 'hidden'}">
+                                    ${item.compressedBlob ? 'Compressed: ' + formatBytes(item.compressedBlob.size) : ''}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                        <div id="status-${item.id}" class="text-sm font-medium text-amber-400 hidden">
+                            <i class="fa-solid fa-spinner animate-spin mr-1"></i> Processing...
+                        </div>
+                        <a id="downloadBtn-${item.id}" href="${item.compressedBlob ? URL.createObjectURL(item.compressedBlob) : '#'}" download="compressed_${item.file.name}" class="${item.compressedBlob ? '' : 'hidden'} bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition">
+                            <i class="fa-solid fa-download"></i> Download
+                        </a>
+                        <button onclick="removeFile(${index})" class="bg-slate-700 hover:bg-red-600 text-slate-300 hover:text-white p-2.5 rounded-lg transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                fileList.appendChild(div);
+            });
+        }
+
+        function removeFile(index) {
+            loadedFiles.splice(index, 1);
+            if(loadedFiles.length === 0) {
+                actionHeader.classList.add('hidden');
+                downloadZipBtn.classList.add('hidden');
+            }
+            renderFileList();
+        }
+
+        function clearAllFiles() {
+            loadedFiles = [];
+            fileInput.value = '';
+            fileList.innerHTML = '';
+            actionHeader.classList.add('hidden');
+            downloadZipBtn.classList.add('hidden');
+        }
+
+        function checkCompressedStatus() {
+            const hasCompressed = loadedFiles.some(item => item.compressedBlob !== null);
+            if (hasCompressed) {
+                downloadZipBtn.classList.remove('hidden');
+            } else {
+                downloadZipBtn.classList.add('hidden');
+            }
+        }
+
+        async function processAllFiles() {
+            const compressBtn = document.getElementById('compressAllBtn');
+            compressBtn.disabled = true;
+            compressBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            for (let item of loadedFiles) {
+                if (!item.compressedBlob) {
+                    await compressSinglePDF(item);
+                }
+            }
+
+            compressBtn.disabled = false;
+            compressBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            checkCompressedStatus();
+        }
+
+        async function compressSinglePDF(item) {
+            const statusEl = document.getElementById(`status-${item.id}`);
+            const downloadBtn = document.getElementById(`downloadBtn-${item.id}`);
+            const compSizeEl = document.getElementById(`compSize-${item.id}`);
+
+            statusEl.classList.remove('hidden');
+
+            const quality = parseInt(qualitySlider.value) / 100;
+            const scale = parseFloat(scaleSlider.value);
+
+            try {
+                const arrayBuffer = await item.file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                const { jsPDF } = window.jspdf;
+                let outPdf = null;
+
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: scale });
+
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                    const imgData = canvas.toDataURL('image/jpeg', quality);
+                    const orientation = viewport.width > viewport.height ? 'l' : 'p';
+                    
+                    if (pageNum === 1) {
+                        outPdf = new jsPDF({
+                            orientation: orientation,
+                            unit: 'px',
+                            format: [viewport.width, viewport.height]
+                        });
+                        outPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+                    } else {
+                        outPdf.addPage([viewport.width, viewport.height], orientation);
+                        outPdf.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+                    }
+                }
+
+                const blob = outPdf.output('blob');
+                item.compressedBlob = blob;
+
+                statusEl.classList.add('hidden');
+                compSizeEl.innerText = `Compressed: ${formatBytes(blob.size)}`;
+                compSizeEl.classList.remove('hidden');
+
+                const downloadUrl = URL.createObjectURL(blob);
+                downloadBtn.href = downloadUrl;
+                downloadBtn.download = `compressed_${item.file.name}`;
+                downloadBtn.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                statusEl.className = "text-sm font-medium text-red-500";
+                statusEl.innerText = "Error Compressing";
+            }
+        }
+
+        async function downloadAllZip() {
+            const zip = new JSZip();
+            let addedCount = 0;
+
+            loadedFiles.forEach(item => {
+                if (item.compressedBlob) {
+                    zip.file(`compressed_${item.file.name}`, item.compressedBlob);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount === 0) return;
+
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            const zipUrl = URL.createObjectURL(zipContent);
+            
+            const link = document.createElement('a');
+            link.href = zipUrl;
+            link.download = "AQ_Compressed_PDFs.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+
+        // ================= EXTRACTOR LOGIC =================
+        const extractFileInput = document.getElementById('extractFileInput');
+        const extractDropZone = document.getElementById('extractDropZone');
+        const extractActionHeader = document.getElementById('extractActionHeader');
+        const extractFileName = document.getElementById('extractFileName');
+        const extractFileMeta = document.getElementById('extractFileMeta');
+        const extractedPagesList = document.getElementById('extractedPagesList');
+        const downloadExtractZipBtn = document.getElementById('downloadExtractZipBtn');
+
+        let targetExtractFile = null;
+        let extractedPagesBlobs = [];
+
+        extractDropZone.addEventListener('dragover', (e) => { e.preventDefault(); extractDropZone.classList.add('border-amber-400'); });
+        extractDropZone.addEventListener('dragleave', () => extractDropZone.classList.remove('border-amber-400'));
+        extractDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.remove('border-amber-400');
+            if (e.dataTransfer.files.length > 0 && e.dataTransfer.files[0].type === "application/pdf") {
+                loadExtractFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        extractFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) loadExtractFile(e.target.files[0]);
+        });
+
+        async function loadExtractFile(file) {
+            targetExtractFile = file;
+            extractedPagesBlobs = [];
+            extractedPagesList.innerHTML = '';
+            downloadExtractZipBtn.classList.add('hidden');
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+            extractFileName.innerText = file.name;
+            extractFileMeta.innerText = `Total Pages: ${pdf.numPages} | Size: ${formatBytes(file.size)}`;
+            extractActionHeader.classList.remove('hidden');
+        }
+
+        async function extractPages() {
+            if (!targetExtractFile) return;
+
+            const extractAllBtn = document.getElementById('extractAllBtn');
+            extractAllBtn.disabled = true;
+            extractAllBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            extractedPagesList.innerHTML = '';
+            extractedPagesBlobs = [];
+
+            try {
+                const arrayBuffer = await targetExtractFile.arrayBuffer();
+                const srcDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pageCount = srcDoc.getPageCount();
+
+                const baseName = targetExtractFile.name.replace(/\.[^/.]+$/, "");
+
+                for (let i = 0; i < pageCount; i++) {
+                    const newDoc = await PDFLib.PDFDocument.create();
+                    const [copiedPage] = await newDoc.copyPages(srcDoc, [i]);
+                    newDoc.addPage(copiedPage);
+
+                    const pdfBytes = await newDoc.save();
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const fileName = `${baseName}_page_${i + 1}.pdf`;
+
+                    extractedPagesBlobs.push({ fileName, blob, pageNum: i + 1 });
+
+                    // Render card for each extracted page
+                    const card = document.createElement('div');
+                    card.className = "bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-lg flex flex-col justify-between items-center text-center gap-3";
+                    card.innerHTML = `
+                        <div class="p-3 bg-purple-500/10 text-purple-400 rounded-full">
+                            <i class="fa-solid fa-file-lines text-2xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-slate-100">Page ${i + 1}</h5>
+                            <p class="text-xs text-slate-400">${formatBytes(blob.size)}</p>
+                        </div>
+                        <a href="${URL.createObjectURL(blob)}" download="${fileName}" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-3 rounded-lg transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-download"></i> Download Page
+                        </a>
+                    `;
+                    extractedPagesList.appendChild(card);
+                }
+
+                downloadExtractZipBtn.classList.remove('hidden');
+
+            } catch (err) {
+                console.error(err);
+                alert("Error extracting pages from PDF.");
+            }
+
+            extractAllBtn.disabled = false;
+            extractAllBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        async function downloadExtractedZip() {
+            if (extractedPagesBlobs.length === 0) return;
+
+            const zip = new JSZip();
+            extractedPagesBlobs.forEach(item => {
+                zip.file(item.fileName, item.blob);
+            });
+
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            const zipUrl = URL.createObjectURL(zipContent);
+
+            const link = document.createElement('a');
+            link.href = zipUrl;
+            link.download = `${targetExtractFile.name.replace(/\.[^/.]+$/, "")}_Extracted_Pages.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearExtractor() {
+            targetExtractFile = null;
+            extractedPagesBlobs = [];
+            extractFileInput.value = '';
+            extractedPagesList.innerHTML = '';
+            extractActionHeader.classList.add('hidden');
+            downloadExtractZipBtn.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
